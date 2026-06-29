@@ -1,0 +1,3 @@
+@echo off
+echo Starting Spotify Local...
+node server.js
