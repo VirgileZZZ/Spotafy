@@ -31,7 +31,6 @@ No accounts and no streaming subscriptions. The core player needs no internet an
 - [Troubleshooting](#troubleshooting)
 - [Privacy](#privacy)
 - [Known limitations](#known-limitations)
-- [License](#license)
 
 ---
 
@@ -530,15 +529,3 @@ If you use neither feature, no external network calls are made.
 - The library lives in memory plus `library.json`; very large libraries (tens of thousands of files) will scan more slowly.
 
 ---
-
-## License
-
-This project is released under the **Apache License, Version 2.0**. The full text is in the [`LICENSE`](./LICENSE) file, and the copyright/attribution notice is in [`NOTICE`](./NOTICE). In short, you may use, modify, and redistribute it (including commercially), provided you keep the license and notices and state any significant changes you make. SPDX identifier: `Apache-2.0`. See https://www.apache.org/licenses/LICENSE-2.0 for the canonical text.
-
-The Apache License covers **this project's own code**. It does not relicense third-party components, which keep their own terms — notably **FFmpeg** (bundled via `ffmpeg-static`, under LGPL/GPL; comply with its license if you redistribute the binary), **yt-dlp** (fetched at runtime, public domain), and the Discord packages (Apache-2.0 / MIT). See `NOTICE` for the list.
-
-Spotify is a trademark of its owner; this project is an independent, Spotify-*inspired* interface and is not affiliated with or endorsed by Spotify. The Apache License grants no trademark rights.
-
-**Downloads and copyright.** The optional **"Add sounds"** feature can download audio from YouTube. You are solely responsible for complying with copyright law and YouTube's Terms of Service in your country. Download only content you have the right to use — public-domain works, your own recordings, or material the rights-holder has licensed for download (e.g. Creative Commons). The software is provided "AS IS", without warranty, and the authors accept no liability for how it is used.
-
-Advanced version by **Claude (Anthropic)**, building on the original Spotafy Local scaffold.
