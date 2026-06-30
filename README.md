@@ -94,10 +94,23 @@ No accounts and no streaming subscriptions. The core player needs no internet an
 - A modern browser (Chrome, Edge, Firefox, or Safari). The audio graph features use the Web Audio API, which all current browsers support.
 
 The core player needs **no dependencies** and no build step. Two optional features reach the internet only when you enable them:
-- **"Add sounds"** (download from YouTube) needs an internet connection. It automatically fetches a small helper tool (`yt-dlp`) on first use; it does **not** need `npm install` or FFmpeg.
+- **"Add sounds"** (download from YouTube) needs an internet connection. It automatically fetches a small helper tool (`yt-dlp`) on first use; it does **not** need `npm install`, a compiler, or FFmpeg.
 - The **Discord broadcast** is the only feature that needs `npm install` (see its dedicated section below).
 
-If you use neither, you can ignore both entirely.
+If you use neither, **Node.js is all you need** — you can ignore everything below.
+
+### Extra tools for the Discord feature (build toolchain)
+
+The Discord feature installs `@discordjs/opus`, which is a **native module**: it must be *compiled* during `npm install`, and on Windows that requires a C/C++ build toolchain. So, in addition to Node.js, you need:
+
+- **Python 3** (from [python.org](https://www.python.org/downloads/)) — tick **"Add Python to PATH"** during install. Used by `node-gyp`, the compiler driver.
+- **Microsoft C++ Build Tools** — download **"Build Tools for Visual Studio"** from [visualstudio.microsoft.com/downloads](https://visualstudio.microsoft.com/downloads/) (under *Tools for Visual Studio*), run the installer, and tick the **"Desktop development with C++"** workload. You do **not** need the full Visual Studio, just the Build Tools.
+
+**Easiest shortcut:** when installing Node.js on Windows, the installer offers a checkbox **"Automatically install the necessary tools (Tools for Native Modules)"**. Tick it and Node will install Chocolatey, Python, and the C++ Build Tools for you — no manual steps.
+
+**No compiler? No problem — skip it entirely.** `@discordjs/opus` is optional. The project also lists `opusscript`, a pure-JavaScript Opus encoder that needs **no compiler, no Python, no Build Tools** (just slightly less efficient). `@discordjs/voice` automatically uses whichever Opus library is present. To go this route, remove `@discordjs/opus` (see the Discord section below) and you can ignore Python and the C++ Build Tools completely.
+
+> macOS/Linux: the toolchain is `python3` plus a C compiler (Xcode Command Line Tools on macOS — `xcode-select --install`; `build-essential` on Debian/Ubuntu). Or just use the `opusscript` route above.
 
 ---
 
@@ -284,20 +297,24 @@ You can have a Discord bot join a voice channel and play whatever you're listeni
 
 ### 1. Install the dependencies (one time)
 
+**Before you start:** this step compiles a native module (`@discordjs/opus`), so make sure you have the build toolchain from the [Requirements](#requirements) section — **Node.js + Python 3 + Microsoft C++ Build Tools** on Windows (or use the no-compiler `opusscript` route described there). Install those **first**, then open a **new** terminal window so it picks up the new tools.
+
 From the project folder:
 
 ```bash
 npm install
 ```
 
-This installs `discord.js`, `@discordjs/voice` (with `libsodium-wrappers` for voice encryption), `ffmpeg-static` (to decode MP3/FLAC/etc.), and `@discordjs/opus` (the Opus encoder).
+This single command installs everything listed in `package.json`: `discord.js`, `@discordjs/voice` (with `libsodium-wrappers` and `@noble/ciphers` for voice encryption), `ffmpeg-static` (to decode MP3/FLAC/etc.), `@discordjs/opus` (the native Opus encoder), and `opusscript` (the pure-JS fallback encoder).
 
-> **If `@discordjs/opus` fails to compile** (it needs build tools on some systems, especially Windows), replace it with the pure-JavaScript encoder instead — it's slower but needs no compiler:
-> ```bash
-> npm uninstall @discordjs/opus
-> npm install opusscript
-> ```
-> `@discordjs/voice` automatically uses whichever Opus library is present, so no code change is needed.
+> **If `@discordjs/opus` fails to compile** (the typical Windows error mentions `node-gyp`, `MSB`, Visual Studio, or Python): you have two options.
+> - **Install the toolchain** (Python 3 + C++ Build Tools, see [Requirements](#requirements)), delete the `node_modules` folder, and run `npm install` again.
+> - **Or drop the native encoder entirely** and use the pure-JavaScript one — no compiler needed:
+>   ```bash
+>   npm uninstall @discordjs/opus
+>   npm install opusscript
+>   ```
+> `@discordjs/voice` automatically uses whichever Opus library is present, so no code change is needed either way.
 
 You can verify your audio stack is complete by running:
 
