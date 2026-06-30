@@ -389,8 +389,6 @@ When metadata is missing, the file name is used as the title and "Artiste inconn
 ├── package.json    # Dependencies for the optional Discord feature only
 ├── start.bat       # Windows quick-start (runs: node server.js)
 ├── README.md       # This file
-├── LICENSE         # Apache License 2.0 (full text)
-├── NOTICE          # Copyright and third-party attribution notice
 ├── bin/            # Auto-downloaded yt-dlp binary (created on first "Add sounds")
 ├── song/           # Your media files (created on first run)
 └── library.json    # Saved favorites + custom playlists (created on first save)
