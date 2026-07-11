@@ -4,7 +4,7 @@ A self-hosted, **zero-dependency** music player with a Spotify-inspired interfac
 
 No accounts, no streaming, no internet required, no `npm install`. Just Node.js and your files.
 
-> **Credits.** The advanced version documented here — server-side favorites and playlists, embedded-metadata and cover-art parsing, synced `.lrc` lyrics, advanced loudness normalization, the equalizer, the iPhone background-playback mode, the full mobile UI, drag-and-drop, and automatic library detection. It builds on the original "Spotafy Local" scaffold (a Spotify-style folder player by Mimo 2.5 , Opus 4.8 and Hy3 / OpenCode ). The application remains a single `server.js` plus a single `index.html`, with **no third-party packages**.
+> **Credits.** The advanced version documented here — server-side favorites and playlists, embedded-metadata and cover-art parsing, synced `.lrc` lyrics, advanced loudness normalization, the equalizer, the iPhone background-playback mode, the full mobile UI, drag-and-drop, and automatic library detection. This project has been made using Opus 4.8 in ClaudeCode and Mimo 2.5 Pro and Hy3 in OpenCode .The application remains a single `server.js` plus a single `index.html`, with **no third-party packages**.
 
 ---
 
