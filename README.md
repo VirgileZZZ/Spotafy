@@ -299,7 +299,7 @@ You should see at least one Opus library, one encryption library, and FFmpeg lis
 3. Paste the bot token, click **Connecter**. Once it shows *En ligne*, pick a voice channel from the dropdown.
 4. Press play on any track — it now streams into that channel. Use **Couper le son de l'ordinateur** if you only want to hear it through Discord.
 
-The token is stored only in your browser's `localStorage` (`spotify_dc_token`) and held in the server's memory while it runs — it is never written to `library.json` or any other file on disk. The bot stays connected across page reloads; it disconnects when you click **Déconnecter** or stop the server.
+The token is stored only in your browser's `localStorage` (`spotafy_dc_token`) and held in the server's memory while it runs — it is never written to `library.json` or any other file on disk. The bot stays connected across page reloads; it disconnects when you click **Déconnecter** or stop the server.
 
 ### Notes and limits
 
@@ -385,7 +385,7 @@ When metadata is missing, the file name is used as the title and "Artiste inconn
 
   Paths are relative to the `song/` folder. You can back this file up or edit it by hand (keep valid JSON).
 
-- **Browser `localStorage`** (per browser/device): UI and audio preferences, plus playback resume info. Keys include `spotify_volume`, `spotify_shuffle`, `spotify_repeat`, `spotify_playlist`, `spotify_norm`, `spotify_eq`, `spotify_eq_on`, `spotify_bg`, `spotify_gain` (per-track normalization cache), and `spotify_last` (resume).
+- **Browser `localStorage`** (per browser/device): UI and audio preferences, plus playback resume info. Keys include `spotafy_volume`, `spotafy_shuffle`, `spotafy_repeat`, `spotafy_playlist`, `spotafy_norm`, `spotafy_eq`, `spotafy_eq_on`, `spotafy_bg`, `spotafy_gain` (per-track normalization cache), and `spotafy_last` (resume).
 
 ---
 
