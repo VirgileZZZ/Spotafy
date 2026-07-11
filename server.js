@@ -111,7 +111,8 @@ const MIME = {
   '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.ogg': 'audio/ogg', '.flac': 'audio/flac',
   '.aac': 'audio/aac', '.m4a': 'audio/mp4', '.wma': 'audio/x-ms-wma', '.opus': 'audio/opus',
   '.mp4': 'video/mp4', '.mov': 'video/quicktime', '.m4v': 'video/x-m4v', '.webm': 'video/webm', '.mkv': 'video/x-matroska',
-  '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css'
+  '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css',
+  '.png': 'image/png', '.json': 'application/json', '.webmanifest': 'application/manifest+json'
 };
 
 /* ---------------------------------------------------------------------------
@@ -680,6 +681,30 @@ const server = http.createServer(async (req, res) => {
       fs.createReadStream(filePath).on('error', onStreamErr).pipe(res);
     }
     return;
+  }
+
+  // --- Fichiers PWA (manifest, service worker, icônes) ---
+  const PWA_ASSETS = {
+    '/manifest.webmanifest': 'manifest.webmanifest',
+    '/manifest.json': 'manifest.webmanifest',
+    '/sw.js': 'sw.js',
+    '/icon-192.png': 'icon-192.png',
+    '/icon-512.png': 'icon-512.png',
+    '/apple-touch-icon.png': 'apple-touch-icon.png'
+  };
+  if (PWA_ASSETS[url]) {
+    const file = path.join(__dirname, PWA_ASSETS[url]);
+    if (fs.existsSync(file)) {
+      const ext = path.extname(file).toLowerCase();
+      const mt = MIME[ext] || 'application/octet-stream';
+      // Le service worker ne doit jamais être mis en cache par le navigateur
+      // (sinon impossible de le mettre à jour) ; le reste l'est 1 jour.
+      const cache = url === '/sw.js' ? 'no-cache' : 'public, max-age=86400';
+      res.writeHead(200, { 'Content-Type': mt, 'Cache-Control': cache });
+      fs.createReadStream(file).pipe(res);
+      return;
+    }
+    res.writeHead(404); res.end(); return;
   }
 
   if (req.url === '/' || req.url === '/index.html') {
