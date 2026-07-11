@@ -185,12 +185,6 @@ The player is also a **Progressive Web App (PWA)**: you can "install" it so it g
 - The interface (UI, buttons, layout) is cached by the service worker, so it opens instantly and even loads with **no connection** (you still need the computer/server reachable to actually play music).
 - The music itself is streamed live from your PC, so playback still requires the phone to be connected to the same network (or to the tunnel/address that reaches your PC). A PWA cannot make the audio play fully offline — that would require a native app that stores files on the phone.
 
-**Files added for the PWA**
-- `manifest.webmanifest` — app name, icon, and full-screen (`standalone`) display settings.
-- `sw.js` — service worker that caches the interface for fast/offline opening.
-- `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` — app icons.
-- `server.js` and `index.html` were updated to serve these files and to register the service worker / link the manifest (including the iOS `apple-mobile-web-app-capable` tags).
-
 ---
 
 ## Interface guide
