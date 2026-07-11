@@ -2,9 +2,9 @@
 
 A self-hosted, **zero-dependency** music player with a Spotify-inspired interface. It scans a folder of your own audio/video files, reads their embedded metadata and cover art, and serves a polished web player you can use from any device on your local network — desktop, Android, or iPhone.
 
-No accounts and no streaming subscriptions. The core player needs no internet and no `npm install` — just Node.js and your files. Two optional extras do use the internet when you turn them on: the **"Add sounds"** downloader (find a track on YouTube and save it into your library) and the **Discord broadcast**.
+No accounts, no streaming, no internet required, no `npm install`. Just Node.js and your files.
 
-> **Credits.** The advanced version documented here — server-side favorites and playlists, embedded-metadata and cover-art parsing, synced `.lrc` lyrics, the **"Add sounds" YouTube downloader**, advanced loudness normalization, the equalizer, the iPhone background-playback mode, the full mobile UI, drag-and-drop, and automatic library detection — was designed and largely written by **Claude (Anthropic)**. It builds on the original "Spotafy Local" scaffold (a Spotify-style folder player by Mimo 2.5 / OpenClaude). The core application remains a single `server.js` plus a single `index.html`, with **no third-party packages** (the optional Discord broadcast is the only feature that uses npm packages).
+> **Credits.** The advanced version documented here — server-side favorites and playlists, embedded-metadata and cover-art parsing, synced `.lrc` lyrics, advanced loudness normalization, the equalizer, the iPhone background-playback mode, the full mobile UI, drag-and-drop, and automatic library detection. It builds on the original "Spotafy Local" scaffold (a Spotify-style folder player by Mimo 2.5 , Opus 4.8 and Hy3 / OpenCode ). The application remains a single `server.js` plus a single `index.html`, with **no third-party packages**.
 
 ---
 
@@ -14,8 +14,8 @@ No accounts and no streaming subscriptions. The core player needs no internet an
 - [Requirements](#requirements)
 - [Install and run](#install-and-run)
 - [Adding your music](#adding-your-music)
-- [Adding music from YouTube ("Add sounds")](#adding-music-from-youtube-add-sounds)
 - [Using it on your phone (iPhone / Android)](#using-it-on-your-phone-iphone--android)
+- [Install as an app on your phone (PWA)](#install-as-an-app-on-your-phone-pwa)
 - [Interface guide](#interface-guide)
 - [Favorites and playlists](#favorites-and-playlists)
 - [Lyrics (.lrc)](#lyrics-lrc)
@@ -31,6 +31,7 @@ No accounts and no streaming subscriptions. The core player needs no internet an
 - [Troubleshooting](#troubleshooting)
 - [Privacy](#privacy)
 - [Known limitations](#known-limitations)
+- [License](#license)
 
 ---
 
@@ -74,12 +75,6 @@ No accounts and no streaming subscriptions. The core player needs no internet an
 **Discord broadcast (optional)**
 - Connect a Discord bot from the settings panel and stream whatever you're playing into a voice channel; play / pause / skip stay in sync with the web player. Requires a one-time `npm install` (see its section below).
 
-**Add sounds (download from YouTube, optional)**
-- Search YouTube and install a track into your library in one click — no separate downloader app, no `npm install`, and no FFmpeg needed.
-- Saves the best available audio, plus the video thumbnail (used as the cover) and, when available, time-synced `.lrc` lyrics from [LRCLIB](https://lrclib.net).
-- The required `yt-dlp` tool is fetched automatically on first use.
-- *Use responsibly — see the copyright notice in [that section](#adding-music-from-youtube-add-sounds).*
-
 **Other**
 - Search across title, artist, and album.
 - Keyboard shortcuts.
@@ -93,24 +88,7 @@ No accounts and no streaming subscriptions. The core player needs no internet an
 - [Node.js](https://nodejs.org/) (any reasonably recent LTS release).
 - A modern browser (Chrome, Edge, Firefox, or Safari). The audio graph features use the Web Audio API, which all current browsers support.
 
-The core player needs **no dependencies** and no build step. Two optional features reach the internet only when you enable them:
-- **"Add sounds"** (download from YouTube) needs an internet connection. It automatically fetches a small helper tool (`yt-dlp`) on first use; it does **not** need `npm install`, a compiler, or FFmpeg.
-- The **Discord broadcast** is the only feature that needs `npm install` (see its dedicated section below).
-
-If you use neither, **Node.js is all you need** — you can ignore everything below.
-
-### Extra tools for the Discord feature (build toolchain)
-
-The Discord feature installs `@discordjs/opus`, which is a **native module**: it must be *compiled* during `npm install`, and on Windows that requires a C/C++ build toolchain. So, in addition to Node.js, you need:
-
-- **Python 3** (from [python.org](https://www.python.org/downloads/)) — tick **"Add Python to PATH"** during install. Used by `node-gyp`, the compiler driver.
-- **Microsoft C++ Build Tools** — download **"Build Tools for Visual Studio"** from [visualstudio.microsoft.com/downloads](https://visualstudio.microsoft.com/downloads/) (under *Tools for Visual Studio*), run the installer, and tick the **"Desktop development with C++"** workload. You do **not** need the full Visual Studio, just the Build Tools.
-
-**Easiest shortcut:** when installing Node.js on Windows, the installer offers a checkbox **"Automatically install the necessary tools (Tools for Native Modules)"**. Tick it and Node will install Chocolatey, Python, and the C++ Build Tools for you — no manual steps.
-
-**No compiler? No problem — skip it entirely.** `@discordjs/opus` is optional. The project also lists `opusscript`, a pure-JavaScript Opus encoder that needs **no compiler, no Python, no Build Tools** (just slightly less efficient). `@discordjs/voice` automatically uses whichever Opus library is present. To go this route, remove `@discordjs/opus` (see the Discord section below) and you can ignore Python and the C++ Build Tools completely.
-
-> macOS/Linux: the toolchain is `python3` plus a C compiler (Xcode Command Line Tools on macOS — `xcode-select --install`; `build-essential` on Debian/Ubuntu). Or just use the `opusscript` route above.
+The core player needs **no dependencies** and no build step. The optional **Discord broadcast** feature is the only thing that needs `npm install` (see its dedicated section below); if you never enable it, you can ignore that entirely.
 
 ---
 
@@ -171,42 +149,6 @@ Embedded lyrics inside the audio file are also read when no sidecar file is foun
 
 ---
 
-## Adding music from YouTube ("Add sounds")
-
-A built-in way to find a track and save it straight into your library, without leaving the app or using a separate downloader.
-
-> **⚠️ Copyright / legal notice — read this first.**
-> This feature downloads audio from YouTube. Downloading content you do not own, or that you have no right to copy, may infringe copyright and generally violates YouTube's Terms of Service. Use it **only** for material that is in the public domain, that you own, or that the rights-holder has explicitly licensed for download (for example, Creative Commons tracks). **You alone are responsible** for what you download and how you use it. This tool is provided for personal, lawful use; the authors accept no liability for misuse.
-
-### How to use it
-
-1. In the sidebar (bottom-left, next to your playlists), click **"Ajouter des sons"** (*Add sounds*).
-2. A search box opens. Type a song title, artist, or any keywords and press `Enter` (or click **Rechercher**).
-3. A list of matching YouTube results appears — thumbnail, title, channel, and duration.
-4. Click **Installer** next to a result. A progress bar shows the download; when it finishes, the track appears in your library automatically (no manual refresh needed).
-
-### What gets saved
-
-For each track you install, three files land in your `song/` folder, all sharing the same base name:
-
-- The **best available audio** stream, kept as-is — usually a `.webm`/Opus or `.m4a` file. There is **no re-encoding**, so it's fast and needs no FFmpeg. These formats play directly in the browser.
-- The **video thumbnail** (a `.webp` image), shown as the track's cover throughout the app.
-- **Synced lyrics**, when available: the app looks them up on [LRCLIB](https://lrclib.net) (a free, open lyrics database) using the cleaned-up title and saves a `.lrc` file. Lyrics then scroll in time in the Now Playing panel. If no match is found, the track is still installed — just without lyrics.
-
-The image and lyrics files sit next to the audio file; they are **not** shown as separate tracks.
-
-### First run
-
-The downloader uses [yt-dlp](https://github.com/yt-dlp/yt-dlp), a well-maintained standalone tool. The **first** time you install a track, Spotafy Local downloads the small `yt-dlp` binary automatically into a `bin/` folder (one time, ~30 MB), so the first search or install may take a few extra seconds. After that it's quick. If `yt-dlp` is already on your system `PATH`, that copy is used instead.
-
-**No `npm install` and no FFmpeg are required** for this feature — only an internet connection (to reach YouTube, GitHub for the one-time `yt-dlp` download, and LRCLIB for lyrics).
-
-### Cleaning up
-
-Tracks added this way are normal files; delete them like any other (remove the audio file, and optionally the matching `.webp`/`.lrc` next to it). To bulk-remove leftovers from earlier versions, search your `song/` folder for `.webm`, `.temp`, or `.webp` in the file explorer and delete what you don't want — your existing `.mp3` files won't be touched.
-
----
-
 ## Using it on your phone (iPhone / Android)
 
 The player is served over your local network, so your phone can use it while the computer is running.
@@ -224,6 +166,30 @@ On the phone:
 - To keep music playing with the screen locked, enable **"Background playback (iPhone)"** in settings, then **reload the page** (see the caveats below).
 
 > If your phone can't reach the page, your computer's firewall may be blocking inbound connections on port 3000. Allow Node.js through the firewall, or allow the port on a private network.
+
+---
+
+## Install as an app on your phone (PWA)
+
+The player is also a **Progressive Web App (PWA)**: you can "install" it so it gets its own icon on the home screen and opens in full screen, without the browser address bar — just like a native app.
+
+**On iPhone (Safari):**
+1. Open `http://<computer-ip>:3000` in Safari while on the same Wi-Fi as the computer.
+2. Tap the **Share** button (square with an arrow), then **Add to Home Screen**.
+3. Name it (e.g. "Spotafy") and tap **Add**. The app now appears on your home screen with its icon and opens full screen.
+
+**On Android (Chrome/Edge):**
+1. Open the same URL, tap the menu (**⋮**), then **Install app** / **Add to Home screen**.
+
+**What this changes**
+- The interface (UI, buttons, layout) is cached by the service worker, so it opens instantly and even loads with **no connection** (you still need the computer/server reachable to actually play music).
+- The music itself is streamed live from your PC, so playback still requires the phone to be connected to the same network (or to the tunnel/address that reaches your PC). A PWA cannot make the audio play fully offline — that would require a native app that stores files on the phone.
+
+**Files added for the PWA**
+- `manifest.webmanifest` — app name, icon, and full-screen (`standalone`) display settings.
+- `sw.js` — service worker that caches the interface for fast/offline opening.
+- `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` — app icons.
+- `server.js` and `index.html` were updated to serve these files and to register the service worker / link the manifest (including the iOS `apple-mobile-web-app-capable` tags).
 
 ---
 
@@ -297,24 +263,20 @@ You can have a Discord bot join a voice channel and play whatever you're listeni
 
 ### 1. Install the dependencies (one time)
 
-**Before you start:** this step compiles a native module (`@discordjs/opus`), so make sure you have the build toolchain from the [Requirements](#requirements) section — **Node.js + Python 3 + Microsoft C++ Build Tools** on Windows (or use the no-compiler `opusscript` route described there). Install those **first**, then open a **new** terminal window so it picks up the new tools.
-
 From the project folder:
 
 ```bash
 npm install
 ```
 
-This single command installs everything listed in `package.json`: `discord.js`, `@discordjs/voice` (with `libsodium-wrappers` and `@noble/ciphers` for voice encryption), `ffmpeg-static` (to decode MP3/FLAC/etc.), `@discordjs/opus` (the native Opus encoder), and `opusscript` (the pure-JS fallback encoder).
+This installs `discord.js`, `@discordjs/voice` (with `libsodium-wrappers` for voice encryption), `ffmpeg-static` (to decode MP3/FLAC/etc.), and `@discordjs/opus` (the Opus encoder).
 
-> **If `@discordjs/opus` fails to compile** (the typical Windows error mentions `node-gyp`, `MSB`, Visual Studio, or Python): you have two options.
-> - **Install the toolchain** (Python 3 + C++ Build Tools, see [Requirements](#requirements)), delete the `node_modules` folder, and run `npm install` again.
-> - **Or drop the native encoder entirely** and use the pure-JavaScript one — no compiler needed:
->   ```bash
->   npm uninstall @discordjs/opus
->   npm install opusscript
->   ```
-> `@discordjs/voice` automatically uses whichever Opus library is present, so no code change is needed either way.
+> **If `@discordjs/opus` fails to compile** (it needs build tools on some systems, especially Windows), replace it with the pure-JavaScript encoder instead — it's slower but needs no compiler:
+> ```bash
+> npm uninstall @discordjs/opus
+> npm install opusscript
+> ```
+> `@discordjs/voice` automatically uses whichever Opus library is present, so no code change is needed.
 
 You can verify your audio stack is complete by running:
 
@@ -379,8 +341,6 @@ The token is stored only in your browser's `localStorage` (`spotify_dc_token`) a
 **Audio:** MP3, WAV, OGG, FLAC, AAC, M4A, WMA, OPUS.
 **Video:** MP4, MOV, M4V, WEBM, MKV (played as audio; the video frame is hidden).
 
-Tracks added via **"Add sounds"** are saved in their native streaming format (usually WEBM/Opus or M4A) and play directly in the browser. Their cover comes from a downloaded `.webp` sidecar image, and lyrics (when found) from a `.lrc` sidecar — see [Adding music from YouTube](#adding-music-from-youtube-add-sounds).
-
 Metadata and cover-art extraction by format:
 
 | Format | Title / Artist / Album | Embedded cover art | Embedded lyrics |
@@ -401,12 +361,15 @@ When metadata is missing, the file name is used as the title and "Artiste inconn
 .
 ├── index.html      # Entire frontend: HTML + CSS + JS in one file
 ├── server.js       # Node.js HTTP server (pure standard library)
-├── yt-download.js  # Optional "Add sounds" downloader (uses yt-dlp; no npm deps)
+├── manifest.webmanifest # PWA manifest (name, icon, full-screen display)
+├── sw.js           # Service worker: caches the UI for fast/offline opening
+├── icon-192.png    # PWA icon (192×192)
+├── icon-512.png    # PWA icon (512×512, also used as maskable)
+├── apple-touch-icon.png # Icon used when added to the iOS home screen
 ├── discord-bot.js  # Optional Discord voice bot (deps loaded lazily)
 ├── package.json    # Dependencies for the optional Discord feature only
 ├── start.bat       # Windows quick-start (runs: node server.js)
 ├── README.md       # This file
-├── bin/            # Auto-downloaded yt-dlp binary (created on first "Add sounds")
 ├── song/           # Your media files (created on first run)
 └── library.json    # Saved favorites + custom playlists (created on first save)
 ```
@@ -430,10 +393,6 @@ When metadata is missing, the file name is used as the title and "Artiste inconn
 
 - **Browser `localStorage`** (per browser/device): UI and audio preferences, plus playback resume info. Keys include `spotify_volume`, `spotify_shuffle`, `spotify_repeat`, `spotify_playlist`, `spotify_norm`, `spotify_eq`, `spotify_eq_on`, `spotify_bg`, `spotify_gain` (per-track normalization cache), and `spotify_last` (resume).
 
-- **`bin/`** (next to `server.js`): holds the `yt-dlp` binary, downloaded automatically the first time you use **"Add sounds"**. Safe to delete; it will be re-downloaded when next needed.
-
-- **Sidecar files in `song/`**: tracks added via **"Add sounds"** come with a matching `.webp` (cover image) and, when found, a `.lrc` (synced lyrics) next to the audio file. They share the track's base name.
-
 ---
 
 ## HTTP API reference
@@ -449,9 +408,6 @@ All responses are JSON unless noted. Paths in request bodies are relative to `so
 | `GET` | `/cover/<path>` | Embedded cover image bytes for a track (cached 1 day). |
 | `GET` | `/lyrics/<path>` | `{ synced: boolean, text: string }` from sidecar or embedded lyrics. |
 | `GET` | `/song/<path>` | The media stream, with HTTP `Range` support for seeking. |
-| `GET` | `/api/yt/search?q=...` | *(Add sounds)* Search YouTube; returns `[{ id, title, channel, duration, thumb }]`. |
-| `POST` | `/api/yt/download` | *(Add sounds)* Body `{ id, title }`. Starts a download; returns `{ jobId }`. |
-| `GET` | `/api/yt/progress?id=...` | *(Add sounds)* Progress of a job: `{ status, percent, title, file, error }`. |
 | `POST` | `/api/like` | Body `{ path, liked }`. Adds/removes a favorite (de-duplicated). |
 | `POST` | `/api/playlists` | Body `{ action, ... }`. See below. |
 | `GET` | `/api/discord/status` | Bot state: `{ status, user, guildName, channelName, playing, nowPlaying, hasDeps, ... }`. |
@@ -515,23 +471,11 @@ Another process (or a second copy of this app) is using it. Close it, or change 
 **Lyrics show as garbled characters.**
 Save the `.lrc` as UTF-8 if possible. The server also handles UTF-16 and falls back to Windows-1252, but UTF-8 is the most reliable.
 
-**"Add sounds" finds nothing or an install fails.**
-Make sure you have an internet connection. The first install also downloads the `yt-dlp` tool, which can take a few seconds — if it can't reach GitHub (firewall/proxy), the install fails; allow Node.js through your firewall and try again. YouTube occasionally changes its site, which can temporarily break downloads; deleting the `bin/` folder forces a fresh `yt-dlp` to be fetched, which usually resolves it.
-
-**A downloaded track has no cover or no lyrics.**
-The cover comes from the video's thumbnail, saved as a `.webp` next to the track; if it's missing, the download of that image failed (harmless — playback still works). Lyrics are looked up on LRCLIB by title and only exist if a match is found, so some tracks simply won't have them.
-
 ---
 
 ## Privacy
 
-The **core player** runs entirely locally: your files never leave your machine, there is no telemetry and no analytics, and the only LAN traffic is between your browser/phone and your own computer.
-
-Two optional features reach the internet, and only when you choose to use them:
-- **"Add sounds"** contacts YouTube (to search and download), GitHub (once, to fetch the `yt-dlp` tool), and LRCLIB (to look up lyrics).
-- **Discord broadcast** connects to Discord once you enable and start the bot.
-
-If you use neither feature, no external network calls are made.
+Everything runs locally. Your files never leave your machine, there is no telemetry, no analytics, and no external network calls. The only network traffic is between your browser/phone and your own computer on your LAN.
 
 ---
 
@@ -540,7 +484,10 @@ If you use neither feature, no external network calls are made.
 - OGG/Opus embedded cover art is not extracted (other metadata is).
 - Drag-and-drop reordering and track-to-playlist dragging are designed for desktop; on phones use the **⋯** track menu instead.
 - Background mode on iPhone disables normalization, EQ, and the visualizer by design.
-- Tracks added via **"Add sounds"** are saved in YouTube's native audio format (often WEBM/Opus). These play in Chrome, Edge, and Firefox, but **WEBM/Opus does not play in Safari** (iPhone/Mac); if you use Safari, prefer sources that deliver M4A, or convert such files to MP3 yourself.
 - The library lives in memory plus `library.json`; very large libraries (tens of thousands of files) will scan more slowly.
 
 ---
+
+## License
+
+Provided as-is for personal, local use. Spotify is a trademark of its owner; this project is an independent, Spotify-*inspired* interface and is not affiliated with or endorsed by Spotify.
